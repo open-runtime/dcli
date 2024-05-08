@@ -1,5 +1,9 @@
-dependency_overrides: 
-  dcli: 
-    path: ../dcli
-  dcli_core: 
-    path: ../dcli_core
+dependency_overrides:
+  dcli:
+    git:
+      url: https://github.com/open-runtime/dcli.git
+      path: dcli
+  dcli_core:
+    git:
+      url: https://github.com/open-runtime/dcli.git
+      path: dcli_core

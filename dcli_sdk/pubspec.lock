@@ -140,38 +140,48 @@ packages:
   dcli:
     dependency: "direct main"
     description:
-      path: "../dcli"
-      relative: true
-    source: path
-    version: "4.0.1-alpha.8"
+      path: dcli
+      ref: HEAD
+      resolved-ref: e0495007e5b392cc422b083c85e1a5d7955c3a11
+      url: "https://github.com/open-runtime/dcli.git"
+    source: git
+    version: "4.0.1-alpha.10"
   dcli_common:
     dependency: "direct main"
     description:
-      path: "../dcli_common"
-      relative: true
-    source: path
-    version: "4.0.1-alpha.8"
+      path: dcli_common
+      ref: HEAD
+      resolved-ref: e0495007e5b392cc422b083c85e1a5d7955c3a11
+      url: "https://github.com/open-runtime/dcli.git"
+    source: git
+    version: "4.0.1-alpha.10"
   dcli_core:
     dependency: "direct main"
     description:
-      path: "../dcli_core"
-      relative: true
-    source: path
-    version: "4.0.1-alpha.9"
+      path: dcli_core
+      ref: HEAD
+      resolved-ref: e0495007e5b392cc422b083c85e1a5d7955c3a11
+      url: "https://github.com/open-runtime/dcli.git"
+    source: git
+    version: "4.0.1-alpha.10"
   dcli_terminal:
     dependency: "direct main"
     description:
-      path: "../dcli_terminal"
-      relative: true
-    source: path
-    version: "4.0.1-alpha.9"
+      path: dcli_terminal
+      ref: HEAD
+      resolved-ref: e0495007e5b392cc422b083c85e1a5d7955c3a11
+      url: "https://github.com/open-runtime/dcli.git"
+    source: git
+    version: "4.0.1-alpha.10"
   dcli_test:
     dependency: "direct dev"
     description:
-      path: "../dcli_test"
-      relative: true
-    source: path
-    version: "4.0.1-alpha.8"
+      path: dcli_test
+      ref: HEAD
+      resolved-ref: e0495007e5b392cc422b083c85e1a5d7955c3a11
+      url: "https://github.com/open-runtime/dcli.git"
+    source: git
+    version: "4.0.1-alpha.10"
   equatable:
     dependency: transitive
     description:
@@ -348,6 +358,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
+  native_synchronization:
+    dependency: transitive
+    description:
+      name: native_synchronization
+      sha256: ff200fe0a64d733ff7d4dde2005271c297db81007604c8cd21037959858133ab
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.0"
   node_preamble:
     dependency: transitive
     description:
@@ -431,10 +449,12 @@ packages:
   settings_yaml:
     dependency: "direct overridden"
     description:
-      path: "../../settings_yaml"
-      relative: true
-    source: path
-    version: "8.1.0-alpha.1"
+      path: "."
+      ref: HEAD
+      resolved-ref: "38ca24779fa7369c08314ff96306bdf3f6ca4044"
+      url: "https://github.com/open-runtime/settings_yaml.git"
+    source: git
+    version: "5.0.0"
   shelf:
     dependency: transitive
     description:

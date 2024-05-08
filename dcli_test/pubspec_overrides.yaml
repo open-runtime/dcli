@@ -1,9 +1,16 @@
 dependency_overrides:
-  dcli: 
-    path: ../dcli
-  dcli_core: 
-    path: ../dcli_core
-  dcli_common: 
-    path: ../dcli_common    
+  dcli:
+    git:
+      url: https://github.com/open-runtime/dcli.git
+      path: dcli
+  dcli_common:
+    git:
+      url: https://github.com/open-runtime/dcli.git
+      path: dcli_common
+  dcli_core:
+    git:
+      url: https://github.com/open-runtime/dcli.git
+      path: dcli_core
   settings_yaml:
-    path: ../../settings_yaml
+    git:
+      url: https://github.com/open-runtime/settings_yaml.git

@@ -1,3 +1,9 @@
 dependency_overrides:
-  dcli_terminal: 
-    path: ../dcli_terminal
+  dcli_terminal:
+    git:
+      url: https://github.com/open-runtime/dcli.git
+      path: dcli_terminal
+  dcli_core:
+    git:
+      url: https://github.com/open-runtime/dcli.git
+      path: dcli_core
