@@ -15,12 +15,10 @@ dependency_overrides:
     git:
       url: https://github.com/open-runtime/dcli.git
       path: dcli_test
-
   dcli_terminal:
     git:
       url: https://github.com/open-runtime/dcli.git
       path: dcli_terminal
-
   settings_yaml:
     git:
       url: https://github.com/open-runtime/settings_yaml.git
