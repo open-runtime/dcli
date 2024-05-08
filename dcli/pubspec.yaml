@@ -16,9 +16,9 @@ dependencies:
   crypto: ^3.0.0
   csv: ^5.0.1
   dart_console2: ^3.0.0
-  dcli_common: ^4.0.1-alpha.10
-  dcli_core: ^4.0.1-alpha.10
-  dcli_terminal: ^4.0.1-alpha.10
+  dcli_common:
+  dcli_core:
+  dcli_terminal:
   equatable: ^2.0.0
   ffi: ^2.0.0
   file: ^7.0.0
@@ -34,7 +34,7 @@ dependencies:
   pubspec_lock: ^3.0.1
   pubspec_manager: ^1.0.0-alpha.15
   scope: ^4.1.0
-  settings_yaml: ^8.1.0-alpha.1
+  settings_yaml:
   stack_trace: ^1.10.0
   system_info2: ^4.0.0
   uuid: ^4.1.0
