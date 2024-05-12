@@ -4,11 +4,27 @@ packages:
   archive:
     dependency: transitive
     description:
+<<<<<<<< HEAD:dcli_unit_tester/test/test_script/traditional_project/pubspec.lock
       name: archive
       sha256: "0763b45fa9294197a2885c8567927e2830ade852e5c896fd4ab7e0e348d0f373"
       url: "https://pub.dev"
     source: hosted
     version: "3.5.0"
+========
+      name: _fe_analyzer_shared
+      sha256: "0b2f2bd91ba804e53a61d757b986f89f1f9eaed5b11e4b2f5a2468d86d6c9fc7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "67.0.0"
+  analyzer:
+    dependency: transitive
+    description:
+      name: analyzer
+      sha256: "37577842a27e4338429a1cbc32679d508836510b056f1eedf0c8d20e39c1383d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.4.1"
+>>>>>>>> upstream/master:dcli_terminal/pubspec.lock
   args:
     dependency: transitive
     description:
@@ -73,6 +89,17 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.1"
+<<<<<<<< HEAD:dcli_unit_tester/test/test_script/traditional_project/pubspec.lock
+========
+  coverage:
+    dependency: transitive
+    description:
+      name: coverage
+      sha256: "8acabb8306b57a409bf4c83522065672ee13179297a6bb0cb9ead73948df7c76"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.7.2"
+>>>>>>>> upstream/master:dcli_terminal/pubspec.lock
   crypto:
     dependency: transitive
     description:
@@ -81,6 +108,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.3"
+<<<<<<<< HEAD:dcli_unit_tester/test/test_script/traditional_project/pubspec.lock
   csv:
     dependency: transitive
     description:
@@ -133,6 +161,16 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.5"
+========
+  dart_console:
+    dependency: "direct main"
+    description:
+      name: dart_console
+      sha256: eae9ddd7bb69477a6e9821c75d575874e290887da09292732a35ab510d1de713
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.0"
+>>>>>>>> upstream/master:dcli_terminal/pubspec.lock
   ffi:
     dependency: transitive
     description:
@@ -152,6 +190,7 @@ packages:
   fixnum:
     dependency: transitive
     description:
+<<<<<<<< HEAD:dcli_unit_tester/test/test_script/traditional_project/pubspec.lock
       name: fixnum
       sha256: "25517a4deb0c03aa0f32fd12db525856438902d9c16536311e76cdc57b31d7d1"
       url: "https://pub.dev"
@@ -165,6 +204,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+========
+      name: frontend_server_client
+      sha256: f64a0333a82f30b0cca061bc3d143813a486dc086b574bfb233b7c1372427694
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0"
+>>>>>>>> upstream/master:dcli_terminal/pubspec.lock
   glob:
     dependency: transitive
     description:
@@ -197,14 +243,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.19.0"
+<<<<<<<< HEAD:dcli_unit_tester/test/test_script/traditional_project/pubspec.lock
   json2yaml:
+========
+  io:
+>>>>>>>> upstream/master:dcli_terminal/pubspec.lock
     dependency: transitive
     description:
       name: json2yaml
       sha256: da94630fbc56079426fdd167ae58373286f603371075b69bf46d848d63ba3e51
       url: "https://pub.dev"
     source: hosted
+<<<<<<<< HEAD:dcli_unit_tester/test/test_script/traditional_project/pubspec.lock
     version: "3.0.1"
+========
+    version: "1.0.4"
+  js:
+    dependency: transitive
+    description:
+      name: js
+      sha256: c1b2e9b5ea78c45e1a0788d29606ba27dc5f71f019f32ca5140f61ef071838cf
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.1"
+>>>>>>>> upstream/master:dcli_terminal/pubspec.lock
   lint_hard:
     dependency: "direct dev"
     description:
@@ -229,6 +291,17 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+<<<<<<<< HEAD:dcli_unit_tester/test/test_script/traditional_project/pubspec.lock
+========
+  matcher:
+    dependency: transitive
+    description:
+      name: matcher
+      sha256: d2323aa2060500f906aa31a895b4030b6da3ebdcc5619d14ce1aada65cd161cb
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.12.16+1"
+>>>>>>>> upstream/master:dcli_terminal/pubspec.lock
   meta:
     dependency: transitive
     description:
@@ -245,7 +318,11 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
+<<<<<<<< HEAD:dcli_unit_tester/test/test_script/traditional_project/pubspec.lock
   native_synchronization:
+========
+  node_preamble:
+>>>>>>>> upstream/master:dcli_terminal/pubspec.lock
     dependency: transitive
     description:
       name: native_synchronization
@@ -261,7 +338,11 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.0"
+<<<<<<<< HEAD:dcli_unit_tester/test/test_script/traditional_project/pubspec.lock
   posix:
+========
+  pool:
+>>>>>>>> upstream/master:dcli_terminal/pubspec.lock
     dependency: transitive
     description:
       name: posix
@@ -373,6 +454,33 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.1"
+<<<<<<<< HEAD:dcli_unit_tester/test/test_script/traditional_project/pubspec.lock
+========
+  test:
+    dependency: "direct dev"
+    description:
+      name: test
+      sha256: d72b538180efcf8413cd2e4e6fcc7ae99c7712e0909eb9223f9da6e6d0ef715f
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.25.4"
+  test_api:
+    dependency: transitive
+    description:
+      name: test_api
+      sha256: "2419f20b0c8677b2d67c8ac4d1ac7372d862dc6c460cdbb052b40155408cd794"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.1"
+  test_core:
+    dependency: transitive
+    description:
+      name: test_core
+      sha256: "4d070a6bc36c1c4e89f20d353bfd71dc30cdf2bd0e14349090af360a029ab292"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.6.2"
+>>>>>>>> upstream/master:dcli_terminal/pubspec.lock
   typed_data:
     dependency: transitive
     description:
@@ -384,18 +492,28 @@ packages:
   unicode:
     dependency: transitive
     description:
+<<<<<<<< HEAD:dcli_unit_tester/test/test_script/traditional_project/pubspec.lock
       name: unicode
       sha256: "0f69e46593d65245774d4f17125c6084d2c20b4e473a983f6e21b7d7762218f1"
       url: "https://pub.dev"
     source: hosted
     version: "0.3.1"
   uuid:
+========
+      name: vm_service
+      sha256: "3923c89304b715fb1eb6423f017651664a03bf5f4b29983627c4da791f74a4ec"
+      url: "https://pub.dev"
+    source: hosted
+    version: "14.2.1"
+  watcher:
+>>>>>>>> upstream/master:dcli_terminal/pubspec.lock
     dependency: transitive
     description:
       name: uuid
       sha256: "814e9e88f21a176ae1359149021870e87f7cddaf633ab678a5d2b0bff7fd1ba8"
       url: "https://pub.dev"
     source: hosted
+<<<<<<<< HEAD:dcli_unit_tester/test/test_script/traditional_project/pubspec.lock
     version: "4.4.0"
   validators2:
     dependency: transitive
@@ -405,14 +523,48 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.0.0"
+========
+    version: "1.1.0"
+  web:
+    dependency: transitive
+    description:
+      name: web
+      sha256: "97da13628db363c635202ad97068d47c5b8aa555808e7a9411963c533b449b27"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.1"
+  web_socket_channel:
+    dependency: transitive
+    description:
+      name: web_socket_channel
+      sha256: "58c6666b342a38816b2e7e50ed0f1e261959630becd4c879c4f26bfa14aa5a42"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.5"
+  webkit_inspection_protocol:
+    dependency: transitive
+    description:
+      name: webkit_inspection_protocol
+      sha256: "87d3f2333bb240704cd3f1c6b5b7acd8a10e7f0bc28c28dcf14e782014f4a572"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.1"
+>>>>>>>> upstream/master:dcli_terminal/pubspec.lock
   win32:
     dependency: transitive
     description:
       name: win32
+<<<<<<<< HEAD:dcli_unit_tester/test/test_script/traditional_project/pubspec.lock
       sha256: "8cb58b45c47dcb42ab3651533626161d6b67a2921917d8d429791f76972b3480"
       url: "https://pub.dev"
     source: hosted
     version: "5.3.0"
+========
+      sha256: "0eaf06e3446824099858367950a813472af675116bf63f008a4c2a75ae13e9cb"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.5.0"
+>>>>>>>> upstream/master:dcli_terminal/pubspec.lock
   yaml:
     dependency: transitive
     description:
