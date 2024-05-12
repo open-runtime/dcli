@@ -17,7 +17,7 @@ import 'package:stack_trace/stack_trace.dart';
 import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
 
-import 'test_scope.dart';
+import '../dcli_test.dart';
 
 class TestFileSystem {
   /// The TestFileSystem allows you to run
@@ -112,18 +112,18 @@ class TestFileSystem {
   /// Run the passed callback [action] within the scope
   /// of the [TestFileSystem].
   Future<void> withinZone(
-    void Function(TestFileSystem fs) action,
+    Future<void> Function(TestFileSystem fs) action,
   ) async {
     final stack = Trace.current(1);
 
     await withTestScope((testDir) async {
-      _runUnderLock(stack, action);
+      await _runUnderLock(stack, action);
     }, pathToTestDir: fsRoot);
   }
 
   Future<void> _runUnderLock(
     Trace stack,
-    void Function(TestFileSystem fs) action,
+    Future<void> Function(TestFileSystem fs) action,
   ) async {
     final frame = stack.frames[0];
 
@@ -138,28 +138,21 @@ class TestFileSystem {
       env['HOME'] = fsRoot;
       home = fsRoot;
 
-      /// Force PubCache path to point at the new file system.
-      // PubCache().pathTo = join(fsRoot, PubCache().cacheDir);
-
-      // rebuildPath();
-
       final isolateID = Service.getIsolateId(Isolate.current);
       print(green('Using TestFileSystem $fsRoot for Isolate: $isolateID'));
 
-      initFS();
+      await initFS();
 
       if (!dcliActivated) {
         print(blue('Globally activating DCli into test file system'));
-        // ignore: discarded_futures
-        final activate = capture(() async {
+        await capture(() async {
           PubCache().globalActivateFromSource(
               join(DartProject.self.pathToProjectRoot, '..', 'dcli_sdk'));
         }, progress: Progress.printStdErr());
-        await activate;
         dcliActivated = true;
       }
 
-      action(this);
+      await action(this);
     }
     // ignore: avoid_catches_without_on_clauses
     catch (e, st) {
@@ -176,7 +169,7 @@ class TestFileSystem {
     }
   }
 
-  void initFS() {
+  Future<void> initFS() async {
     if (!initialised) {
       initialised = true;
 
@@ -187,10 +180,10 @@ class TestFileSystem {
       /// the tests scripts the paths to pub-cache keep getting
       /// broken.
       // copyPubCache(originalHome, HOME);
-      copyTestScripts();
+      await copyTestScripts();
       testDirectoryTree = TestDirectoryTree(fsRoot);
 
-      installCrossPlatformTestScripts();
+      await installCrossPlatformTestScripts();
     }
   }
 
@@ -301,7 +294,7 @@ class TestFileSystem {
   }
 
   //
-  void copyTestScripts() {
+  Future<void> copyTestScripts() async {
     print('Copying test_script into TestFileSystem... ');
 
     final verbose = Settings().isVerbose;
@@ -313,11 +306,11 @@ class TestFileSystem {
     }
 
     copyTree(
-      join(DartProject.self.pathToProjectRoot, 'test', 'test_script'),
+      join(pathToPackageUnitTester, 'test', 'test_script'),
       testScriptPath,
     );
 
-    _patchRelativeDependenciesAndWarmup(testScriptPath);
+    await _patchRelativeDependenciesAndWarmup(testScriptPath);
 
     Settings().setVerbose(enabled: verbose);
   }
@@ -329,22 +322,27 @@ class TestFileSystem {
     find('pubspec.yaml', workingDirectory: testScriptPath)
         .forEach((pathToPubspec) async {
       final dcliProject = DartProject.fromPath('.');
-      final dcliCoreProject = DartProject.fromPath(join('..', 'dcli_core'));
 
-      final pathToDCli = join(dcliProject.pathToProjectRoot);
-      final pathToCore = join(dcliCoreProject.pathToProjectRoot);
+      final pathToDCliRoot = dirname(dcliProject.pathToProjectRoot);
 
       join(dirname(pathToPubspec), 'pubspec_overrides.yaml').write('''
 dependency_overrides: 
   dcli: 
-    path: $pathToDCli
+    path: ${join(pathToDCliRoot, 'dcli')}
+  dcli_common: 
+    path: ${join(pathToDCliRoot, 'dcli_common')}
   dcli_core: 
-    path: $pathToCore
+    path: ${join(pathToDCliRoot, 'dcli_core')}
+  dcli_input: 
+    path: ${join(pathToDCliRoot, 'dcli_input')}
+  dcli_terminal: 
+    path: ${join(pathToDCliRoot, 'dcli_terminal')}  
         ''');
 
       // ignore: discarded_futures
       await capture(() async {
-        DartProject.fromPath(dirname(pathToPubspec)).warmup(upgrade: true);
+        await DartProject.fromPath(dirname(pathToPubspec))
+            .warmup(upgrade: true);
       }, progress: Progress.printStdErr());
     });
   }
@@ -376,15 +374,14 @@ dependency_overrides:
         createDir(Settings().pathToDCliBin, recursive: true);
       }
 
-      // ignore: discarded_futures
       await capture(() async {
-        DartProject.fromPath('pathToTools').warmup();
+        await DartProject.fromPath(pathToTools).warmup();
       }, progress: Progress.printStdErr());
 
       await NamedLock(suffix: 'compile').withLock(() async {
         for (final command in required) {
-          final script =
-              DartScript.fromFile('test/test_script/general/bin/$command.dart');
+          final script = DartScript.fromFile(join(pathToPackageUnitTester,
+              'test', 'test_script', 'general', 'bin', '$command.dart'));
           if (!exists(join(pathToTools, script.pathToExe))) {
             /// compile and install the command into the tool path
             script.compile();
@@ -396,7 +393,7 @@ dependency_overrides:
   }
 
   bool isDCliRunningFromSource() =>
-      PubCache().isGloballyActivatedFromSource('dcli');
+      PubCache().isGloballyActivatedFromSource('dcli_sdk');
 }
 
 class TestFileSystemException extends DCliException {

@@ -51,6 +51,9 @@ class ProcessRunner {
 
     var mode =
         settings.detached ? ProcessStartMode.detached : ProcessStartMode.normal;
+
+    // can't use inheritedStdio when we run in an isolate
+    // this will need to be somehow managed from the primary isolate.
     if (settings.terminal) {
       mode = ProcessStartMode.inheritStdio;
     }
@@ -97,6 +100,7 @@ class ProcessRunner {
     }
 
     try {
+      _logRunner('about to start process');
       process = await Process.start(
         _parsed.cmd,
         _parsed.args,
@@ -105,7 +109,9 @@ class ProcessRunner {
         mode: mode,
         environment: settings.environment.envVars,
       );
+      _logRunner('runner has started process');
     } on ProcessException catch (e) {
+      _logRunner('exception launching process: $e');
       if (e.errorCode == 2) {
         final ep = e;
         throw RunException.withArgs(
@@ -114,6 +120,9 @@ class ProcessRunner {
           ep.errorCode,
           'Could not find ${ep.executable} on the path.',
         );
+      } else {
+        throw RunException.withArgs(
+            e.executable, e.arguments, e.errorCode, e.message);
       }
     }
   }
@@ -149,4 +158,8 @@ class ProcessRunner {
   //   }));
   //   return waitForEx<int>(exited.future);
   // }
+}
+
+void _logRunner(String message) {
+  // _logRunner(message);
 }

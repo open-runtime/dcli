@@ -120,7 +120,7 @@ class InstallCommand extends Command {
     }
     _qprint('');
 
-    initTemplates((line) => _qprint(line));
+    initTemplates(_qprint);
 
     // create the bin directory
     final binPath = Settings().pathToDCliBin;
@@ -168,7 +168,7 @@ class InstallCommand extends Command {
     if (!exists(dcliLocation)) {
       print('');
       print('ERROR: dcli was not found on your path!');
-      print("Try running 'dart pub global activate dcli' again.");
+      print("Try running 'dart pub global activate dcli_sdk' again.");
       print('  otherwise');
       print('Try to resolve the problem and then run dcli install again.');
       print('dcli is normally located in ${PubCache().pathToBin}');

@@ -1,0 +1,34 @@
+name: general
+description: used for testing.
+version: 1.0.0
+
+environment: 
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  args: ^2.3.1
+  dcli: ^3.0.0
+  dcli_core: ^3.0.0
+  path: ^1.8.0
+  
+
+dev_dependencies:
+  lint_hard: ^3.0.0
+
+dependency_overrides: 
+  dcli: 
+    path: ../../../../dcli
+  dcli_common: 
+    path: ../../../../dcli_common
+  dcli_core: 
+    path: ../../../../dcli_core
+  dcli_terminal: 
+    path: ../../../../dcli_terminal
+
+
+
+executables: 
+  dcli_unit_tester: 
+
+
+ 

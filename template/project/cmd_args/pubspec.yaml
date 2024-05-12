@@ -1,13 +1,14 @@
 name: scriptname
 version: 0.0.1
+description: test of command arg passing.
 
 environment:
-  flutter:
   sdk: '>=3.0.0 <4.0.0'
+  flutter:
 
 dependencies:
   args: ^2.0.0
-  dcli: 4.0.1-alpha.7
+  dcli: 4.0.1-beta.3
 
 dev_dependencies:
   lint_hard: ^4.0.0

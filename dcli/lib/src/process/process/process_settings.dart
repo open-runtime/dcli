@@ -11,7 +11,6 @@ class ProcessSettings {
       String? workingDirectory,
       this.runInShell = false,
       this.detached = false,
-      this.waitForStart = true,
       this.terminal = false,
       this.privileged = false,
       this.extensionSearch = true,
@@ -37,10 +36,13 @@ class ProcessSettings {
 
   bool runInShell = false;
   bool detached = false;
-  bool waitForStart = true;
   bool terminal = false;
   bool privileged = false;
   bool extensionSearch = true;
 
   bool isPriviledgedUser = false;
+
+  /// If we are running with mode terminal or detached then
+  /// we don't have access to the stdio streams.
+  bool get hasStdio => !(terminal | detached);
 }

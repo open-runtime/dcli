@@ -24,8 +24,10 @@ void main() {
         // make certain our test script will run
         '${DCliPaths().dcliName} -v warmup  ${dirname(script)}'.run;
 
+        print('calling toList');
+
         // run a script that prints to stdout and prove that toList captures it.
-        final results = '${DCliPaths().dcliName} $script'.toList();
+        final results = '${DartSdk().pathToDartExe} $script'.toList();
 
         final expected = <String>['Hello World'];
 
@@ -44,7 +46,8 @@ void main() {
 
         // run a script that uses '.run' and capture its output to prove
         // that .run works.
-        final results = '${DCliPaths().dcliName} $script'.toList(nothrow: true);
+        final results =
+            '${DartSdk().pathToDartExe} $script'.toList(nothrow: true);
 
         final expected = <String>['Hello World - Error'];
 
@@ -63,7 +66,8 @@ void main() {
 
         // run a script that uses '.run' and capture its output to prove
         // that .run works.
-        final results = '${DCliPaths().dcliName} $script'.toList(nothrow: true);
+        final results =
+            '${DartSdk().pathToDartExe} $script'.toList(nothrow: true);
 
         final expected = <String>[
           'Hello World - StdOut',
@@ -86,7 +90,8 @@ void main() {
 
         // run a script that uses '.run' and capture its output to prove
         // that .run works.
-        final results = '${DCliPaths().dcliName} $script'.toList(nothrow: true);
+        final results =
+            '${DartSdk().pathToDartExe} $script'.toList(nothrow: true);
 
         final expected = <String>[
           'Hello World - StdOut',

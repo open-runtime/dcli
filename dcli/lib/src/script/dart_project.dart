@@ -116,8 +116,8 @@ class DartProject {
       /// The packageConfig is available if passed (which unit tests do)
       /// and when passed is probably the most relable means of
       /// determining the project directory.
-      return _current ??=
-          DartProject.fromPath(dirname(io.Platform.packageConfig!));
+      return _current ??= DartProject.fromPath(
+          dirname(dirname(Uri.parse(io.Platform.packageConfig!).path)));
     }
     final script = DartScript.self;
     var startFrom = '.';
@@ -186,7 +186,7 @@ class DartProject {
 
     print('');
     _colprint('Dependencies', '');
-    for (final dependency in pubSpec.dependencies) {
+    for (final dependency in pubSpec.dependencies.list) {
       _colprint(dependency.name, dependency.toString());
     }
   }
@@ -337,7 +337,7 @@ class DartProject {
     await NamedLock(
       suffix: _lockName,
       lockPath: pathToProjectRoot,
-    ).withLock(() {
+    ).withLock(() async {
       final pubGet = PubGet(this);
       if (Shell.current.isSudo) {
         /// bugger we just screwed the cache permissions so lets fix them.
@@ -360,7 +360,7 @@ class DartProject {
     await NamedLock(
       suffix: _lockName,
       lockPath: pathToProjectRoot,
-    ).withLock(() {
+    ).withLock(() async {
       final pubUpgrade = PubUpgrade(this);
       if (Shell.current.isSudo) {
         /// bugger we just screwed the cache permissions so lets fix them.

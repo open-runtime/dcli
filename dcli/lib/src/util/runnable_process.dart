@@ -5,16 +5,18 @@
  */
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:dcli_core/dcli_core.dart' as core;
+import 'package:native_synchronization/mailbox.dart';
 import 'package:path/path.dart';
 
 import '../../dcli.dart';
 import '../process/environment.dart';
+import '../process/process/message.dart';
+import '../process/process/message_response.dart';
+import '../process/process/process_in_isolate2.dart';
 import '../process/process/process_settings.dart';
-import '../process/process/process_sync.dart';
 import '../progress/progress_impl.dart';
 import 'capture.dart';
 import 'parse_cli_command.dart';
@@ -26,8 +28,10 @@ import 'parse_cli_command.dart';
 /// CLI applications should, by convention, write error messages
 /// out to stderr and expected output to stdout.
 ///
-/// [line] the line to write to stderr.
-void printerr(String? line) {
+/// Calls toString on [object] and writes it to stderr.
+void printerr(Object? object) {
+  final line = '$object';
+
   /// Co-operate with runDCliZone
   final overloaded = Zone.current[capturePrinterrKey] as CaptureZonePrintErr?;
   if (overloaded != null) {
@@ -40,9 +44,9 @@ void printerr(String? line) {
 ///
 class RunnableProcess {
   RunnableProcess._internal(this._parsed, this.workingDirectory) {
-    _streamsFlushed =
-        // ignore: discarded_futures
-        Future.wait<void>([_stdoutFlushed.future, _stderrFlushed.future]);
+    // _streamsFlushed =
+    // ignore: discarded_futures
+    Future.wait<void>([_stdoutFlushed.future, _stderrFlushed.future]);
   }
 
   /// Spawns a process to run the command contained in [cmdLine] along with
@@ -73,7 +77,7 @@ class RunnableProcess {
   // late Future<Process> _fProcess;
 
   /// The running process.
-  ProcessSync? processSync;
+  // ProcessSync? processSync;
 
   /// The directory the process is running in.
   final String? workingDirectory;
@@ -84,7 +88,7 @@ class RunnableProcess {
   /// for stdout and stderr to be flushed.
   final Completer<void> _stdoutFlushed = Completer<void>();
   final Completer<void> _stderrFlushed = Completer<void>();
-  late Future<List<void>> _streamsFlushed;
+  // late Future<List<void>> _streamsFlushed;
 
   /// returns the original command line that started this process.
   String get cmdLine => '${_parsed.cmd} ${_parsed.args.join(' ')}';
@@ -138,12 +142,12 @@ class RunnableProcess {
   }) async {
     progress ??= Progress.devNull();
 
-    start(
-      runInShell: runInShell,
-      privileged: privileged,
-      extensionSearch: extensionSearch,
-    );
-    await processStream(progress, nothrow: nothrow);
+    // start(
+    //   runInShell: runInShell,
+    //   privileged: privileged,
+    //   extensionSearch: extensionSearch,
+    // );
+    // await processStream(progress, nothrow: nothrow);
 
     return progress;
   }
@@ -191,55 +195,39 @@ class RunnableProcess {
         terminal: terminal,
         privileged: privileged,
         extensionSearch: extensionSearch,
+        nothrow: nothrow,
+        progress: progress as ProgressImpl,
       );
-      if (terminal == true) {
-        /// we can't process io as the terminal
-        // has inherited the IO so we dont' see it.
-        _waitForExit(processSync!, progress, nothrow: nothrow);
-      } else {
-        if (detached == false) {
-          processUntilExit(progress, nothrow: nothrow);
-        }
-        // else we are detached and won't see the child exit
-        // so no point waiting.
-      }
-    } finally {
-      (progress as ProgressImpl).close();
-    }
-    return progress;
-  }
+      // if (terminal == true) {
+      //   /// we can't process io as the terminal
+      //   // has inherited the IO so we dont' see it.
+      //   _waitForExit(processSync!, progress, nothrow: nothrow);
+      // } else {
 
-  Progress runV2({
-    required bool terminal,
-    Progress? progress,
-    bool runInShell = false,
-    bool detached = false,
-    bool privileged = false,
-    bool nothrow = false,
-    bool extensionSearch = true,
-  }) {
-    progress ??= Progress.print();
+      // ignore: discarded_futures, cascade_invocations
 
-    try {
-      ProcessSettings(
-        cmdLine,
-        runInShell: runInShell,
-        detached: detached,
-        terminal: terminal,
-        privileged: privileged,
-        extensionSearch: extensionSearch,
-      );
-      if (terminal == true) {
-        /// we can't process io as the terminal
-        // has inherited the IO so we dont' see it.
-        _waitForExit(processSync!, progress, nothrow: nothrow);
-      } else {
-        if (detached == false) {
-          processUntilExit(progress, nothrow: nothrow);
+      _logProcess('spawn completed - waithing for process exit');
+
+      /// whether we have a terminal or not we use the same
+      /// process to read any io that comes back until
+      /// we see an exit code.
+      if (detached == false) {
+        if (exitCode != 0 && nothrow == false) {
+          throw RunException.withArgs(
+            _parsed.cmd,
+            _parsed.args,
+            exitCode,
+            'The command '
+            // ignore: lines_longer_than_80_chars
+            '${red('[${_parsed.cmd}] with args [${_parsed.args.join(', ')}]')}'
+            ' failed with exitCode: $exitCode '
+            'workingDirectory: $workingDirectory',
+          );
         }
-        // else we are detached and won't see the child exit
-        // so no point waiting.
       }
+      // else we are detached and won't see the child exit
+      // so no point waiting.
+      // }
     } finally {
       (progress as ProgressImpl).close();
     }
@@ -268,9 +256,10 @@ class RunnableProcess {
   /// If you pass [detached] = true then the process is spawned
   /// but we don't wait for it to complete nor is any io available.
   void start({
+    required ProgressImpl progress,
+    bool nothrow = false,
     bool runInShell = false,
     bool detached = false,
-    bool waitForStart = true,
     bool terminal = false,
     bool privileged = false,
     bool extensionSearch = true,
@@ -331,68 +320,45 @@ class RunnableProcess {
         workingDirectory: workdir,
         runInShell: runInShell,
         detached: detached,
-        waitForStart: waitForStart,
         terminal: terminal,
         privileged: privileged,
         extensionSearch: extensionSearch,
         environment: ProcessEnvironment());
 
-    // run the process until completion.
-    processSync = ProcessSync()..run(processSettings);
+    late final mailboxFromPrimaryIsolate = Mailbox();
+    final mailboxToPrimaryIsolate = Mailbox();
 
-    // // we wait for the process to start.
-    // // if the start fails we get a clean exception
-    // // by waiting here.
-    // if (waitForStart) {
-    //   _waitForStart();
-    // }
-  }
+    startIsolate2(
+        processSettings, mailboxFromPrimaryIsolate, mailboxToPrimaryIsolate);
 
-  // void _waitForStart() {
-  //   final complete = Completer<Process>();
+    MessageResponse response;
+    do {
+      response = MessageResponse.fromData(mailboxToPrimaryIsolate.take())
+        ..onStdout((payload) {
+          progress.addToStdout(payload);
+        })
+        ..onStderr((payload) {
+          progress.addToStderr(payload);
+        })
+        ..onException((exception) =>
+            Error.throwWithStackTrace(exception, exception.stackTrace));
+    } while (response.messageType != MessageType.exitCode);
 
-  //   unawaited(_fProcess
-  //       .then(complete.complete)
-  //       //ignore: avoid_types_on_closure_parameters
-  //       .catchError((Object e, StackTrace s) {
-  //     // 2 - No such file or directory
-  //     if (e is ProcessException && e.errorCode == 2) {
-  //       final ep = e;
-  //       e = RunException.withArgs(
-  //         ep.executable,
-  //         ep.arguments,
-  //         ep.errorCode,
-  //         'Could not find ${ep.executable} on the path.',
-  //       );
-  //     }
-  //     complete.completeError(e);
-  //   }));
-  //   waitForEx<Process>(complete.future);
-  // }
-
-  /// Waits for the process to exit
-  /// We use this method when we can't or don't
-  /// want to process IO.
-  /// The main use is when using start(terminal:true).
-  /// We don't have access to any IO so we just
-  /// have to wait for things to finish.
-  int? _waitForExit(ProcessSync processSync, Progress progress,
-      {required bool nothrow}) {
-    final exitCode = processSync.waitForExitCode;
-    (progress as ProgressImpl).exitCode = exitCode;
-
-    if (exitCode != 0 && nothrow == false) {
-      throw RunException.withArgs(
-        _parsed.cmd,
-        _parsed.args,
-        exitCode,
-        'The command '
-        '${red('[${_parsed.cmd}] with args [${_parsed.args.join(', ')}]')} '
-        'failed with exitCode: $exitCode '
-        'workingDirectory: $workingDirectory',
-      );
-    }
-    return exitCode;
+    response.onExit((exitCode) {
+      if (exitCode != 0 && nothrow == false) {
+        throw RunException.withArgs(
+          _parsed.cmd,
+          _parsed.args,
+          exitCode,
+          'The command '
+          '${red('[${_parsed.cmd}] with args [${_parsed.args.join(', ')}]')} '
+          'failed with exitCode: $exitCode '
+          'workingDirectory: $workingDirectory',
+        );
+      } else {
+        progress.exitCode = exitCode;
+      }
+    });
   }
 
   /// TODO: does this work now we have moved to mailboxes?
@@ -426,7 +392,8 @@ class RunnableProcess {
   //     (Object e) {
   //       // forget broken pipe after rhs terminates before lhs
   //     },
-  //     test: (e) => e is SocketException && e.osError!.message == 'Broken pipe',
+  //     test: (e) => e is SocketException && e.osError!.message
+  //          == 'Broken pipe',
   //   );
   // }
 
@@ -435,137 +402,40 @@ class RunnableProcess {
   ///
   /// When the process exits it closes the [progress] streams.
   ///
-  Future<void> processStream(Progress progress, {required bool nothrow}) async {
-    _wireStreams(processSync!, progress);
+  // Future<void> processStream(Progress progress, {required bool nothrow})
+  //async {
+  //   _wireStreams(processSync!, progress);
 
-    // trap the process finishing
+  // trap the process finishing
 
-    // this makes no sense as we want the process to run whilst
-    // we process its output so waiting for exit stops us doing that.
-    // final exitCode = processSync!.waitForExitCode;
-    // CONSIDER: do we pass the exitCode to ForEach or just throw?
-    // If the start failed we don't want to rethrow
-    // as the exception will be thrown async and it will
-    // escape as an unhandled exception and stop the whole script
-    // progress.exitCode = exitCode;
-    // if (exitCode != 0 && nothrow == false) {
-    //   final error = RunException.withArgs(
-    //     _parsed.cmd,
-    //     _parsed.args,
-    //     exitCode,
-    //     'The command '
-    //     // ignore: lines_longer_than_80_chars
-    //     '${red('[${_parsed.cmd}] with args [${_parsed.args.join(', ')}]')}'
-    //     ' failed with exitCode: $exitCode '
-    //     'workingDirectory: $workingDirectory',
-    //   );
-    //   progress
-    //     ..onError(error)
-    //     ..close();
-    // } else {
-    //   /// don't think this is neccessary as we are using
-    //   // await _streamsFlushed;
-    //   progress.close();
-    // }
-  }
-
-  // Monitors the process until it exists.
-  // If a LineAction exists we call
-  // line action each time the process emmits a line.
-  /// The [nothrow] argument is EXPERIMENTAL
-  void processUntilExit(Progress? progress, {required bool nothrow}) {
-    final exited = Completer<bool>();
-
-    final progress0 = progress ?? Progress.devNull();
-
-    // _wireStreams(processSync!, progress0);
-
-    List<int>? data;
-
-    /// this section and the next appears to be duplicates
-    /// moving data to the progress stream.
-    /// The problem is how do we know the progress stream
-    /// has been emptied?
-    /// - we could put a counter on it and wait for it to
-    /// match the number of rows we added.
-    /// How do we wait. If we do it synchronously then the data
-    /// on the other side of the stream can't be processed.
-    /// It feels like at some point we need to be async when dealing with
-    /// streams.
-    /// For none streams we can synchronous.
-    ///
-    /// Review the pump - if it pulled data then iot might work.
-    while ((data = processSync!.readStdout()) != null) {
-      (progress0 as ProgressImpl).addToStdout(utf8.decode(data!));
-    }
-
-    processSync!.listenStdout(
-        (data) => (progress0 as ProgressImpl).addToStdout(utf8.decode(data)));
-    processSync!.listenStderr(
-        (data) => (progress0 as ProgressImpl).addToStderr(utf8.decode(data)));
-
-    // Wait for the process to finish
-    final exitCode = processSync!.waitForExitCode;
-
-    // CONSIDER: do we pass the exitCode to ForEach or just throw?
-    // If the start failed we don't want to rethrow
-    // as the exception will be thrown async and it will
-    // escape as an unhandled exception and stop the whole script
-    (progress0 as ProgressImpl).exitCode = exitCode;
-
-    /// the process may have exited but the streams are likely to still
-    /// contain data.
-    _waitForStreams();
-    if (exitCode != 0 && nothrow == false) {
-      exited.completeError(
-        RunException.withArgs(
-          _parsed.cmd,
-          _parsed.args,
-          exitCode,
-          'The command '
-          // ignore: lines_longer_than_80_chars
-          '${red('[${_parsed.cmd}] with args [${_parsed.args.join(', ')}]')}'
-          ' failed with exitCode: $exitCode '
-          'workingDirectory: $workingDirectory',
-        ),
-      );
-    }
-  }
-
-  ///
-  /// processes both streams until they complete.
-  ///
-  void _waitForStreams() {
-    // Wait for both streams to complete
-    // ignore: discarded_futures
-    // TODO: restore - how do we ensure the output from streams has been processed.
-    // waitForEx(Future.wait([_stdoutCompleter.future, _stderrCompleter.future]));
-  }
-
-  final _stdoutCompleter = Completer<bool>();
-  final _stderrCompleter = Completer<bool>();
-
-  void _wireStreams(ProcessSync process, Progress progress) {
-    /// handle stdout stream
-    process
-      ..listenStdout((data) {
-        (progress as ProgressImpl).addToStdout(utf8.decode(data));
-      })
-      ..listenStderr((data) {
-        (progress as ProgressImpl).addToStderr(utf8.decode(data));
-      });
-
-    // // handle stderr stream
-    // process.stderr
-    //     .transform(utf8.decoder)
-    //     .transform(const LineSplitter())
-    //     .listen((line) {
-    //   progress.addToStderr(line);
-    // }).onDone(() {
-    //   _stderrFlushed.complete();
-    //   _stderrCompleter.complete(true);
-    // });
-  }
+  // this makes no sense as we want the process to run whilst
+  // we process its output so waiting for exit stops us doing that.
+  // final exitCode = processSync!.waitForExitCode;
+  // CONSIDER: do we pass the exitCode to ForEach or just throw?
+  // If the start failed we don't want to rethrow
+  // as the exception will be thrown async and it will
+  // escape as an unhandled exception and stop the whole script
+  // progress.exitCode = exitCode;
+  // if (exitCode != 0 && nothrow == false) {
+  //   final error = RunException.withArgs(
+  //     _parsed.cmd,
+  //     _parsed.args,
+  //     exitCode,
+  //     'The command '
+  //     // ignore: lines_longer_than_80_chars
+  //     '${red('[${_parsed.cmd}] with args [${_parsed.args.join(', ')}]')}'
+  //     ' failed with exitCode: $exitCode '
+  //     'workingDirectory: $workingDirectory',
+  //   );
+  //   progress
+  //     ..onError(error)
+  //     ..close();
+  // } else {
+  //   /// don't think this is neccessary as we are using
+  //   // await _streamsFlushed;
+  //   progress.close();
+  // }
+  // }
 }
 
 String searchForCommandExtension(String cmd, String? workingDirectory) {
@@ -596,4 +466,10 @@ String findExtension(String basename, String workingDirectory) {
     }
   }
   return basename;
+}
+
+void _logProcess(String message) {
+  if (debugIsolate) {
+    print('process: $message');
+  }
 }

@@ -17,11 +17,11 @@ mixin ProgressMixin implements Progress {
   }
 
   @override
-  Stream<String> get stream => throw UnimplementedError();
+  Stream<List<int>> get stream => throw UnimplementedError();
 
   @override
   List<String> toList() => lines;
 
   @override
-  String toParagraph() => lines.join('\n');
+  String toParagraph() => lines.join(eol);
 }

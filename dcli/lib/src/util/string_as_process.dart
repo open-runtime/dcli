@@ -5,11 +5,13 @@
  */
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:dcli_core/dcli_core.dart' as core;
 
 import '../functions/run.dart' as cmd;
 import '../progress/progress.dart';
+// import '../progress/progress_impl.dart';
 import 'file_sync.dart';
 import 'parser.dart';
 import 'runnable_process.dart';
@@ -87,41 +89,6 @@ extension StringAsProcess on String {
       progress: Progress(print, stderr: printerr),
     );
   }
-
-  /// shell
-  /// Runs the given string as a command in the OS shell.
-  ///
-  /// Allows you to execute the contents of a dart string as a
-  /// command line application within an OS shell (e.g. bash).
-  /// The application is run as a fully attached child process.
-  ///
-  /// DCli performs Glob expansion on command arguments. See [run] for details.
-  ///
-  /// Any output from the command is displayed on the console.
-  ///
-  ///
-  /// ```dart
-  /// 'zip regions.txt regions.zip'.shell;
-  /// ```
-  ///
-  /// If you need to pass an argument to your application that contains
-  ///  spaces then use nested quotes:
-  ///e.g.
-  ///  ```dart
-  ///  'wc "fred nurk.text"'.shell;
-  ///```
-  /// DCli performs Glob expansion on command arguments. See [run] for details.
-  ///
-  /// See [forEach] to capture output to stdout and stderr
-  ///     [toList] to capture stdout and stderr to [List<String>]
-  ///     [toParagraph] to concatenating the return lines into a single string.
-  ///     [firstLine] - returns just the first line written to stdout.
-  ///     [lastLine] - returns just the last line written to stdout or stderr.
-  ///     [parser] - returns a parser with the captured output ready
-  ///  to be interpreted
-  ///                as one of several file types.
-  @Deprecated('use start(runInShell: true)')
-  void get shell => cmd.run(this, runInShell: true);
 
   /// Runs the contents of this String as a command line application.
   ///
@@ -551,23 +518,27 @@ extension StringAsProcess on String {
       extensionSearch: extensionSearch,
     );
 
-    return progress.stream;
+    return progress.stream
+        .map(String.fromCharCodes)
+        .transform(const LineSplitter());
   }
 
-  /// Experimental - DO NOT USE
-  Sink<List<int>> get sink {
-    final lhsRunnable = RunnableProcess.fromCommandLine(this)
-      ..start(waitForStart: false);
-    return lhsRunnable.sink;
-  }
+  // /// Experimental - DO NOT USE
+  // Sink<List<int>> get sink {
+  //   final lhsRunnable = RunnableProcess.fromCommandLine(this)
+  //     ..start(
+  //         waitForStart: false, progress: Progress.devNull() as ProgressImpl);
+  //   return lhsRunnable.sink;
+  // }
 
-  /// Experimental - DO NOT USE
-  RunnableProcess get process {
-    final process = RunnableProcess.fromCommandLine(this)
-      ..start(waitForStart: false);
+  // /// Experimental - DO NOT USE
+  // RunnableProcess get process {
+  //   final process = RunnableProcess.fromCommandLine(this)
+  //     ..start(
+  //         waitForStart: false, progress: Progress.devNull() as ProgressImpl);
 
-    return process;
-  } // Treat the [this]  as the name of a file and
+  //   return process;
+  // } // Treat the [this]  as the name of a file and
 
   /// Truncates and Writes [line] to the file terminated by [newline].
   /// If [newline] is null or isn't passed then the platform

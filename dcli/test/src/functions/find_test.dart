@@ -19,8 +19,8 @@ import 'package:test/test.dart';
 void main() {
   t.group('Find', () {
     t.test('manualRecursion', () async {
-      final testScriptPath =
-          truepath(DartProject.self.pathToProjectRoot, 'test', 'test_script');
+      final testScriptPath = truepath(DartProject.self.pathToProjectRoot, '..',
+          'dcli_unit_tester', 'test', 'test_script');
 
       final foundDirs = find(
         '*',
@@ -31,6 +31,7 @@ void main() {
       ).toList();
 
       final rootDirs = <String>[
+        truepath(testScriptPath, 'dcli_unit_tester'),
         truepath(testScriptPath, 'general'),
         truepath(testScriptPath, 'traditional_project')
       ];
