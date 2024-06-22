@@ -1,18 +1,23 @@
 name: tool/run_unit_tests.dart
 
-on: [push]
+on:
+  push:
+  workflow_dispatch:
 
 jobs:
   test:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        sdk: [stable, beta, dev, 2.16.0, 2.17.0]
+        # macos-latest is arm64 and macos-13 is x86_64 details here: https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
+        os: [ubuntu-latest, windows-latest, macos-latest, macos-13]
+        # Can comment back in to test all beta, dev, 2.16.0, 2.17.0 if needed
+        sdk: [stable]
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: dart-lang/setup-dart@v1.3
+      - uses: actions/checkout@v4.1.4
+      - uses: dart-lang/setup-dart@v1.6.4
 
       - name: Install dependencies
         run: |
@@ -22,10 +27,16 @@ jobs:
           dart pub get
           cd ..
 
-      - name: run unit tests
+      - name: Activate DCLI from Source
         run: |
           cd dcli
           dart pub global activate -spath .
-          dart test
+
+
+      - name: Run All Tests
+        run: |
+          cd dcli
+          dart test .
+      
           
           

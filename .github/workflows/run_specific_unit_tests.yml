@@ -1,0 +1,62 @@
+name: tool/run_specific_unit_tests.dart
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # macos-latest is arm64 and macos-13 is x86_64 details here: https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
+        os: [ubuntu-latest, windows-latest, macos-latest, macos-13]
+        # Can comment back in to test all beta, dev, 2.16.0, 2.17.0 if needed
+        sdk: [stable]
+
+    steps:
+      - uses: actions/checkout@v4.1.4
+      - uses: dart-lang/setup-dart@v1.6.4
+
+      - name: Install dependencies
+        run: |
+          cd dcli_core
+          dart pub get
+          cd ../dcli
+          dart pub get
+          cd ..
+          
+
+      - name: Activate DCLI from Source
+        run: |
+          cd dcli
+          dart pub global activate -spath .
+
+      - name: Run Specific [OLD] NamedLocks Test - dcli/test/src/util/named_lock_test.test
+        run: |
+          cd dcli
+          dart test test/src/util/named_lock_test.dart
+
+      - name: Run Specific [NEW] NamedLocks Test - dcli/test/src/util/named_lock_test_with_runtime_named_locks_package_test.dart
+        run: |
+          cd dcli
+          dart test test/src/util/named_lock_test_with_runtime_named_locks_package_test.dart
+
+# This one keeps failing
+#      - name: Run Tests in test/src/script/commands
+#        run: |
+#          echo $(pwd)
+#          cd dcli
+#          dart test test/src/script/commands
+
+# This one keeps failing also
+#      - name: Run Specific Dart Project Test - dcli/test/src/script/dart_project_test.test
+#        run: |
+#          echo $(pwd)
+#          cd dcli
+#          dart test test/src/script/dart_project_test.dart
+
+      
+          
+          

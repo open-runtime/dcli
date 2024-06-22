@@ -10,7 +10,6 @@ library;
  */
 
 import 'dart:async';
-import 'dart:io';
 import 'dart:isolate';
 
 import 'package:async/async.dart';
@@ -19,21 +18,11 @@ import 'package:dcli_core/dcli_core.dart' as core;
 import 'package:path/path.dart' hide equals;
 import 'package:test/test.dart';
 
-// const port = 9003;
-
 void main() {
-  test('lock path', () {
-    final lockPath = join(rootPath, Directory.systemTemp.path, 'dcli', 'locks');
-    print(lockPath);
-  });
-
   test('exception catch', () async {
     expect(
-      () {
-        NamedLock(suffix: 'exception').withLock(() {
-          throw DCliException('fake exception');
-        });
-      },
+      NamedLock(suffix: 'exception')
+          .withLock(() => throw DCliException('fake exception')),
       throwsA(isA<DCliException>()),
     );
   });
@@ -124,11 +113,11 @@ Future<ReceivePort> spawn(String message, String logFile) async {
   return port;
 }
 
-Future<void> writeToLog(String data) async {
+FutureOr<void> writeToLog(String data) {
   final parts = data.split(';');
   final message = parts[0];
   final log = parts[1];
-  await NamedLock(suffix: 'test.lock').withLock(() async {
+  NamedLock(suffix: 'test').withLock(() {
     var count = 0;
     for (var i = 0; i < 4; i++) {
       final l = '$message + ${count++}';
@@ -145,10 +134,10 @@ const _lockCheckPath = '/tmp/lockcheck';
 final _lockFailedPath = join(_lockCheckPath, 'lock_failed');
 
 /// must be a global function as we us it to spawn an isolate
-Future<void> worker(int instance) async {
+FutureOr<void> worker(int instance) {
   Settings().setVerbose(enabled: false);
   print('starting worker instance $instance ${DateTime.now()}');
-  await NamedLock(suffix: 'gshared-compile').withLock(() async {
+  NamedLock(suffix: 'gshared-compile').withLock(() {
     print('acquired lock worker $instance  ${DateTime.now()}');
     final inLockPath = join(_lockCheckPath, 'inlock');
 
